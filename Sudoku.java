@@ -65,7 +65,7 @@ class Sudoku
         }
         sub = new subdividedGrid(Grid, SIZE); 			//creates subdivided grid with updated sudoku values
         while (!sub.solved()) {							//while loop keeps checking for solved condition.
-        	placeBasic(1);
+        	placeComplex(sub.getiOfFewestOptions(), sub.getjOfFewestOptions());
         }
         System.out.println("Solved");
    

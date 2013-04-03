@@ -23,26 +23,18 @@ class Sudoku
     /********************************************************/
     /************************To do***************************/
     /********************************************************/
-    /* Use a stack to track the placements of numbers.  To   /
-    /* backtrack simply pop the index of the number from the /
-    /* stack and remove that number.                         /
-    /* 														 /
-    /* Develop an algorithm that will decide based on weights/
-    /* which number/area to place/fill first.  Fill algorithm/
-    /* will be harder; write number algorithm first to have  /
-    /* working prototype.									 /
-    /* 
-    /* To have a backtrack method that properly pops the     /
-    /* appropriate number of placements, an array to store   /
-    /* the number of numbers placed in each method call will /
-    /* be needed.  This way the entirety of a method call can/
-    /* easily be popped.  Alternatively a stack could be used/
-    /* to hold these numbers.                                /
-    /* 
-    /* Need to make some sort of ADT to hold combinations of /
-    /* possibilities.										 /
-    /*/
-          
+   
+    /*
+     * Clean up the bleeding code.  I wrote a new solving algorithm
+     * that, if it works properly (once I get stuff in place to test,
+     * I will), should solve any size of sudoku.  Therefore, there is
+     * a crapload of stuff that is just totally unnecessary.
+     * 
+     * Additionally, perhaps creating some ADT to create an initial
+     * storing of possible numbers for each empty space at first, and
+     * just modifying these as necessary for each number placed will
+     * speed up solving time.
+     */
      
     
     
@@ -60,10 +52,12 @@ class Sudoku
     Stack<Integer> backtrackCounter = new Stack<Integer>();
     subdividedGrid sub = new subdividedGrid(Grid, SIZE);
     int total = 0;
+    int iteration = 0;
     Random r = new Random();
     
     public void solve() {
-        int i, j;										//Declaring variables.
+        int i, j;    									//Declaring variables.
+        System.out.println("Hello");
         for (i = 0; i < Grid.length; i++) {				//Multiplies every value in the grid by 100.  This makes preset numbers easy to find.
         	for (j = 0; j < Grid.length; j++) {			//The checks for valid placements take into account the given number as well as the 
         		Grid[i][j] *= 100;						//number multiplied by 100, but the backtracking methods do not.  Thus the original
@@ -71,29 +65,54 @@ class Sudoku
         }
         sub = new subdividedGrid(Grid, SIZE); 			//creates subdivided grid with updated sudoku values
         while (!sub.solved()) {							//while loop keeps checking for solved condition.
-        	
+        	placeBasic(1);
+        }
+        System.out.println("Solved");
+   
     }
     
-   
+    /*
+     * This is it here.  The prize.  This baby should do all the
+     * work.  It calls a handful of check methods from the subdividedGrid
+     * class, but the main bulk is just in recursively calling the method
+     * on the next cell.  That process can probably be optimised as well
+     * and there are comments discussing this in the subdividedGrid class.
+     */
+    
+    public void placeComplex(int i, int j) {
+    	for (int number = 1; number <= N; number++) {
+    		if (sub.isValidForValue(i, j, number)) {
+    			sub.setValue(i, j, number);
+    		}
+    	}
+    	if (sub.getValue(i, j) == 0) {
+    		return;
+    	} else if (!sub.solved()) {
+    		placeComplex(sub.getiOfFewestOptions(), sub.getjOfFewestOptions());
+    	}
     }
     
     //Temporary, basic method just to complete the assignment
     
+    //This method is now all but obselete.  it is remaining in code until more advanced algorithm
+    //is confirmed to be fully operational.
+    
     public void placeBasic(int value) {
-    	int i, j, k, l, iteration;
+    	int i, j, k, l;
     	i = r.nextInt(SIZE); j = r.nextInt(SIZE);
     	k = r.nextInt(SIZE); l = r.nextInt(SIZE);
-    	iteration = 0;
     	while (sub.countNumberOfGivenValue(value) != 9) {
     		while (sub.checkBoxForValue(i, j, value)) {
     			i = r.nextInt(SIZE); j = r.nextInt(SIZE);
     		} 
-    		while (sub.getValue(i, j, k, l) != 0 || !sub.isValidForValue((k + (SIZE * i)), (l + (SIZE * j)), value)) {
+    		while (sub.getValue(i, j, k, l) != 0 || !sub.isValidForValue((k + (SIZE * i)), (l + (SIZE * j)), value)) {  //fix these parameters...if necessary.  Might not need this method at all.
     			k = r.nextInt(SIZE); l = r.nextInt(SIZE);
     			this.total++;
-    			if (iteration > 10) {
+    			if (total > 10) {
     				sub.remove(value);
+    				sub.remove(value - 1);
     				this.total = 0;
+    				iteration = 0;
     				placeBasic(value - 1);
     			}
     		}
@@ -102,16 +121,15 @@ class Sudoku
     	iteration++;
     	if (iteration != 9) {	//need to fix iteration counter carrying over through recursive calls.
     		placeBasic(value);
+    	} else if (value != 9 && iteration == 9); {
+    		iteration = 0;
+    		placeBasic(value + 1);
     	}
     	
     }
     
-    public void place(int number) {
-    	int i, j, k, l;
-    	int[] numberCountWeight = createNumberWeight();
-    	int[] zeroCountWeight = weighZeros();
-    	
-    }
+    
+    
    
     
   
@@ -186,6 +204,41 @@ class Sudoku
     	
     }
     
+    /*
+     * Experimental recursive algorithm for filling a row.  Should be modifiable
+     * to filling columns and boxes.  Not sure how the whole thing will work yet.
+     * Current plan is for it to run a loop counting through the numbers.  If a
+     * number is legal for the first slot, it places the number and calls itself
+     * again to move to the next empty spot.  It then goes through the numbers to
+     * see if it can place anything legally.  If the method fails at any point, it
+     * breaks out of the recursive call and simply goes to the next step in the 
+     * calling loop.  If the method succeeds, the row will be filled and the method
+     * will move to the next step.  If it fails, the method will clear any numbers it
+     * placed and rewind back to the previous step, which should also be a loop of some
+     * kind.
+     * 
+     * Might make it a boolean method.
+     */
+    
+    public void fillRow(int i, int k) {
+    	for (int number = 1; number <= N; number++) {
+    		if (!sub.checkRowForValue(i, k, number)) {
+    			for (int j = 0; j < N; j++) {
+    				if (isZero((i + (k * SIZE)), j)) {
+    					if (!sub.checkColumnForValue(j, k, number)) {		//Need to modify parameters here.
+    						sub.setValue((i + (k * SIZE)), j, number);
+    						fillRow(i, k);
+    					}
+    				}
+    			}
+    		}
+    	}
+    	if (sub.countZerosInRow(i, k) != 0) {
+    		//reverting method will undo whatever was placed by the calling method.  I think.
+    	}
+    }
+    
+    
    
     	
     
@@ -197,9 +250,9 @@ class Sudoku
      * from the stack as well as the set of numbers last placed.
      */
     
-    public void fillRow(int i) {
+    public void fillwholeRow(int i) {
     	for (int number = 1; number <= N; number++) {
-    		if (!rowContainsNumber(i, number)) {
+    		if (!sub.rowContainsNumber(i, number)) {
     			for (int j = 0; j < N; j++) {
         			if (isZero(i, j)) {
         				if (!columnContainsNumber(j, number) && !boxContainsNumber(i, j, number)) {
@@ -258,6 +311,16 @@ class Sudoku
     public int optionsNumber(int number) {
     	int count = 0;
     	return count;
+    }
+    
+    //Placing method
+    
+
+    public void place(int number) {
+    	int i, j, k, l;
+    	int[] numberCountWeight = createNumberWeight();
+    	int[] zeroCountWeight = weighZeros();
+    	
     }
 
 

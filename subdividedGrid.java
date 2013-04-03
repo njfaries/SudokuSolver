@@ -11,10 +11,21 @@
  * count = sum or running total variable
  */
 
+/**********TO DO***********/
+ /*
+  * Clean up the code.  With the new solving algorithm
+  * much of the checks and resets in this class are
+  * totally unnecessary and not even ever called.  At all.
+  * 
+  * Also implementing the N variable would help make things
+  * look neater and more organised.  Get on that.
+ */
+
 
 public class subdividedGrid {
 	
-	private int size;											
+	private int size;
+	private int N = (size * size);
 	private Box subdividedGrid[][];
 	
 	public subdividedGrid(int[][] Grid, int size) {
@@ -30,8 +41,8 @@ public class subdividedGrid {
 		subdividedGrid[i / size][j / size].setValue((i % size), (j % size), value);
 	}
 	
-	public int getValue(int i, int j, int k, int l) {
-		return subdividedGrid[i][j].getValue(k, l);
+	public int getValue(int i, int j) {
+		return subdividedGrid[i / size][j / size].getValue((i % size), (j % size));
 	}
 	
 	public void remove(int value) {
@@ -217,6 +228,49 @@ public class subdividedGrid {
 		return false;
 	}
 	
+	/*
+	 * Counts how many different numbers could be placed in a specified cell.
+	 */
+	
+	public int countValidNumbers(int i, int j) {
+		int count = 0;
+		for (int number = 1; number <= (size * size); number++) {
+			if (isValidForValue(i, j, number)) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	//These two methods just get the location of the cell with the fewest options.
+	
+	public int getiOfFewestOptions() {
+		int smallest = (size * size);
+		int returni = 0;
+		for (int i = 0; i < (size * size); i++) {
+			for (int j = 0; j < (size * size); j++) {
+				if (countValidNumbers(i, j) < smallest) {
+					smallest = countValidNumbers(i,j);
+					returni = i;
+				}
+			}
+		}
+		return returni;
+	}
+	
+	public int getjOfFewestOptions() {
+		int smallest = (size * size);
+		int returnj = 0;
+		for (int i = 0; i < (size * size); i++) {
+			for (int j = 0; j < (size * size); j++) {
+				if (countValidNumbers(i, j) < smallest) {
+					smallest = countValidNumbers(i,j);
+					returnj = j;
+				}
+			}
+		}
+		return returnj;
+	}
 }
 	
 

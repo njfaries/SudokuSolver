@@ -96,7 +96,7 @@ class Sudoku
     
     //This method is now all but obselete.  it is remaining in code until more advanced algorithm
     //is confirmed to be fully operational.
-    
+    /*
     public void placeBasic(int value) {
     	int i, j, k, l;
     	i = r.nextInt(SIZE); j = r.nextInt(SIZE);
@@ -126,32 +126,7 @@ class Sudoku
     		placeBasic(value + 1);
     	}
     	
-    }
-    
-    
-    
-   
-    
-  
-    
-    /*
-     * This method goes through the weighted array and finds
-     * the number with the largest weight.  It then assigns
-     * that number (index + 1) to the number variable and 
-     * returns it
-     */
-    
-    public int decideNumber(int[] array) {
-    	int number = 0;
-    	int weight = 0;										//Comparison variable
-    	for (int i = 1; i < array.length; i++) {
-    		if (array[i] > weight && array[i] != 9) {		//Does not include finished numbers.
-    			number = (i + 1);							//Careful; potential for off by one error
-    			weight = array[i];							//This tracks which index to assign.
-    		}
-    	}
-    	return number;
-    }
+    } */
     
     /*
      * Looks to see if the given spot is a zero
@@ -164,21 +139,7 @@ class Sudoku
     	return false;
     }
     
-    public void rowBacktrack(int i, int j) {
-    	
-    }
     
-    public void columnBacktrack(int i, int j) {
-    	
-    }
-    
-    public void boxBacktrack(int i, int j) {
-    	
-    }
-    
-    public void numberBacktrack(int number) {
-    	sub.remove(number);
-    }
     
    
     
@@ -188,110 +149,13 @@ class Sudoku
     /*********INCOMPLETE METHODS*********/ 
     /************************************/
     
-    /*
-     * This method creates an array of size 3N that holds weights of zeros
-     * in each row, column, and box.  The box part is tricky as each box is
-     * defined by coordinates that are size specific.  Work still to be done.
-     */
-    public int[] weighZeros() {
-    	int[] weight = new int[N*3];
-    	for (int i = 0; i < N; i++) {
-    		weight[i] = findZerosInColumn(i);
-    		weight[i+N] = findZerosInRow(i);
-    		//Consideration of boxes will go here.
-    	}
-    	return weight;
-    	
-    }
     
-    /*
-     * Experimental recursive algorithm for filling a row.  Should be modifiable
-     * to filling columns and boxes.  Not sure how the whole thing will work yet.
-     * Current plan is for it to run a loop counting through the numbers.  If a
-     * number is legal for the first slot, it places the number and calls itself
-     * again to move to the next empty spot.  It then goes through the numbers to
-     * see if it can place anything legally.  If the method fails at any point, it
-     * breaks out of the recursive call and simply goes to the next step in the 
-     * calling loop.  If the method succeeds, the row will be filled and the method
-     * will move to the next step.  If it fails, the method will clear any numbers it
-     * placed and rewind back to the previous step, which should also be a loop of some
-     * kind.
-     * 
-     * Might make it a boolean method.
-     */
     
-    public void fillRow(int i, int k) {
-    	for (int number = 1; number <= N; number++) {
-    		if (!sub.checkRowForValue(i, k, number)) {
-    			for (int j = 0; j < N; j++) {
-    				if (isZero((i + (k * SIZE)), j)) {
-    					if (!sub.checkColumnForValue(j, k, number)) {		//Need to modify parameters here.
-    						sub.setValue((i + (k * SIZE)), j, number);
-    						fillRow(i, k);
-    					}
-    				}
-    			}
-    		}
-    	}
-    	if (sub.countZerosInRow(i, k) != 0) {
-    		//reverting method will undo whatever was placed by the calling method.  I think.
-    	}
-    }
     
     
    
     	
-    
-    /*
-     * This method fills a row.  It will be called based on
-     * the weighted matrix results.  It is given a row i to fill
-     * and does so with a miniature guesswork system.  If the method
-     * fails it calls the backtracker to pop all numbers placed here
-     * from the stack as well as the set of numbers last placed.
-     */
-    
-    public void fillwholeRow(int i) {
-    	for (int number = 1; number <= N; number++) {
-    		if (!sub.rowContainsNumber(i, number)) {
-    			for (int j = 0; j < N; j++) {
-        			if (isZero(i, j)) {
-        				if (!columnContainsNumber(j, number) && !boxContainsNumber(i, j, number)) {
-        					Grid[i][j] = number;
-        				} 
-        			}
-        		}
-    		}
-    	}
-    	if (findZerosInRow(i) != 0) {
-    		//backtrack.  Will need to find a way to insert a different set of numbers.
-    	}
-    }
-    
-    /*
-     * Same as above, just for a column instead.
-     */
-    
-    public void fillColumn(int j) {
-    	for (int number = 1; number <= N; number++) {
-    		if (!columnContainsNumber(j, number)) {
-    			for (int i = 0; i < N; i++) {
-    				if (isZero(i, j)) {
-    					if (!rowContainsNumber(i, number) && !boxContainsNumber(i, j, number)) {
-    						Grid[i][j] = number;
-    					} 
-    				}
-    			}
-    		}
-    	}
-    	if (findZerosInColumn(j) != 0) {
-    		//backtrack
-    	}
-    }
-    
-    /*
-     * Need a method to track options for a given solution pattern.  No ideas yet for how
-     * this will be done.  Possibly with a tree.
-     */
+   
     
     public int optionsFill(int k, int l, int select) {			//l is only used if we are filling a box
     	int count = 0;
@@ -313,15 +177,7 @@ class Sudoku
     	return count;
     }
     
-    //Placing method
     
-
-    public void place(int number) {
-    	int i, j, k, l;
-    	int[] numberCountWeight = createNumberWeight();
-    	int[] zeroCountWeight = weighZeros();
-    	
-    }
 
 
     /*****************************************************************************/
@@ -455,11 +311,17 @@ class Sudoku
      * outputs the completed puzzle to the standard output. */
     public static void main( String args[] ) throws Exception
     {
+    	System.out.println("Enter name of sudoku txt file: ");
         InputStream in;
-        if( args.length > 0 ) 
+        if( args.length > 0 ) {
             in = new FileInputStream( args[0] );
-        else
-            in = System.in;
+            System.out.println("I'm in here!");
+        }
+        else {
+        	in = System.in;
+        	System.out.println("or here...");
+        }
+            
 
         // The first number in all Sudoku files must represent the size of the puzzle.  See
         // the example files for the file format.

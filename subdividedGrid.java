@@ -243,6 +243,8 @@ public class subdividedGrid {
 	}
 	
 	//These two methods just get the location of the cell with the fewest options.
+	//Should be able to optimize these things by having some kind of universal variable or something.
+	//Maybe....
 	
 	public int getiOfFewestOptions() {
 		int smallest = (size * size);

@@ -56,44 +56,6 @@ public class Box {
 		return false;
 	}
 	
-	//Counts number of zeros in a given row
-	
-	public int countZerosInThisRow(int i) {
-		int count = 0;
-		for (int j = 0; j < size; j++) {
-			if (this.box[i][j] == 0) {
-				count++;
-			}
-		}
-		return count;
-	}
-	
-	//Counts number of zeros in a given column
-	
-	public int countZerosInThisColumn(int j) {
-		int count = 0;
-		for (int i = 0; i < size; i++) {
-			if (this.box[i][j] == 0) {
-				count++;
-			}
-		}
-		return count;
-	}
-	
-	//Counts zeros in the whole box.
-	
-	public int countZerosInThisBox() {
-		int count = 0;
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				if (this.box[i][j] == 0) {
-					count++;
-				}
-			}
-		}
-		return count;
-	}
-	
 	//Sets value of specified index
 	
 	public void setValue(int i, int j, int value) {
@@ -104,33 +66,5 @@ public class Box {
 	
 	public int getValue(int i, int j) {
 		return this.box[i][j];
-	}
-	
-	//Returns zero if value does not exist in box.  Should never happen that the value doesn't exist.
-	
-	public int getiOfValue(int value) {
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				if (this.box[i][j] == value) {
-					return i;
-				}
-			}
-		}
-		return 0;
-	}
-	
-	//Returns zero if value does not exist in box.  Should never happen that the value doesn't exist.
-	
-	public int getjOfValue (int value) {
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				if (this.box[i][j] == value) {
-					return j;
-				}
-			}
-		}
-		return 0;
-	}
-	
-	
+	}	
 }

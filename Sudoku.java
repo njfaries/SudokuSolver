@@ -12,31 +12,13 @@ class Sudoku
     /* The grid contains all the numbers in the Sudoku puzzle.  Numbers which have
      * not yet been revealed are stored as 0. */
     int Grid[][];
-    Box subdividedGrid[][];
+    Box subdividedGrid[][];    			//Array of an object Box.  Used to solve the sudoku.
     
     
 
 
     /* The solve() method should remove all the unknown characters ('x') in the Grid
-     * and replace them with the numbers from 1-9 that satisfy the Sudoku puzzle. */
-    
-    /********************************************************/
-    /************************To do***************************/
-    /********************************************************/
-   
-    /*
-     * Clean up the bleeding code.  I wrote a new solving algorithm
-     * that, if it works properly (once I get stuff in place to test,
-     * I will), should solve any size of sudoku.  Therefore, there is
-     * a crapload of stuff that is just totally unnecessary.
-     * 
-     * Additionally, perhaps creating some ADT to create an initial
-     * storing of possible numbers for each empty space at first, and
-     * just modifying these as necessary for each number placed will
-     * speed up solving time.
-     */
-     
-    
+     * and replace them with the numbers from 1-9 that satisfy the Sudoku puzzle. */    
     
     /*
      * Naming conventions:
@@ -46,29 +28,18 @@ class Sudoku
      * l = range of columns variable
      */
     
-    Stack<Integer> bigBacktrack = new Stack<Integer>();
-    Stack<Integer> rowBacktrack = new Stack<Integer>();
-    Stack<Integer> columnBacktrack = new Stack<Integer>();
-    Stack<Integer> backtrackCounter = new Stack<Integer>();
-    subdividedGrid sub = new subdividedGrid(Grid, SIZE);
-    int total = 0;
-    int iteration = 0;
-    Random r = new Random();
+    subdividedGrid sub;									//Names subdivdedGrid object outside of the scope of solve()
+    													//This makes it easier to handle with other methods.
     
     public void solve() {
-        int i, j;    									//Declaring variables.
-        System.out.println("Hello");
-        for (i = 0; i < Grid.length; i++) {				//Multiplies every value in the grid by 100.  This makes preset numbers easy to find.
-        	for (j = 0; j < Grid.length; j++) {			//The checks for valid placements take into account the given number as well as the 
-        		Grid[i][j] *= 100;						//number multiplied by 100, but the backtracking methods do not.  Thus the original
-        	}											//grid will always remain intact.
-        }
         sub = new subdividedGrid(Grid, SIZE); 			//creates subdivided grid with updated sudoku values
+        //testing();
+        long startTime = System.currentTimeMillis();
         while (!sub.solved()) {							//while loop keeps checking for solved condition.
         	placeComplex(sub.getiOfFewestOptions(), sub.getjOfFewestOptions());
         }
-        System.out.println("Solved");
-   
+        long endTime = System.currentTimeMillis();
+        System.out.println("Running time: " + (endTime - startTime) + " milliseconds.");   
     }
     
     /*
@@ -80,105 +51,18 @@ class Sudoku
      */
     
     public void placeComplex(int i, int j) {
-    	for (int number = 1; number <= N; number++) {
-    		if (sub.isValidForValue(i, j, number)) {
-    			sub.setValue(i, j, number);
+    	int number = 1;																		//Start the for loop at the number 1 for simplicity
+    	for (number = 1; number <= N; number++) {											//Loop runs through all the numbers and checks if they
+    		if (sub.isValidForValue(i, j, number)) {										//are valid to place.  If it is, that number is placed
+    			sub.setValue(i, j, number);													//in both the subdividedGrid and the Grid[][].  The former
+    			Grid[i][j] = number;														//for solving purposes, the latter for printing.  Then the 
+    			if (!sub.solved()) {														//program checks to see if the sudoku is solved.  If it is,
+    				placeComplex(sub.getiOfFewestOptions(), sub.getjOfFewestOptions());		//a recursive call is executed.  If it is not, it continues the
+    				sub.setValue(i, j, 0);													//loop.  The setValue here sets the current space to 0 if the recursive
+    			}																			//call returns to this method.
     		}
     	}
-    	if (sub.getValue(i, j) == 0) {
-    		return;
-    	} else if (!sub.solved()) {
-    		placeComplex(sub.getiOfFewestOptions(), sub.getjOfFewestOptions());
-    	}
-    }
-    
-    //Temporary, basic method just to complete the assignment
-    
-    //This method is now all but obselete.  it is remaining in code until more advanced algorithm
-    //is confirmed to be fully operational.
-    /*
-    public void placeBasic(int value) {
-    	int i, j, k, l;
-    	i = r.nextInt(SIZE); j = r.nextInt(SIZE);
-    	k = r.nextInt(SIZE); l = r.nextInt(SIZE);
-    	while (sub.countNumberOfGivenValue(value) != 9) {
-    		while (sub.checkBoxForValue(i, j, value)) {
-    			i = r.nextInt(SIZE); j = r.nextInt(SIZE);
-    		} 
-    		while (sub.getValue(i, j, k, l) != 0 || !sub.isValidForValue((k + (SIZE * i)), (l + (SIZE * j)), value)) {  //fix these parameters...if necessary.  Might not need this method at all.
-    			k = r.nextInt(SIZE); l = r.nextInt(SIZE);
-    			this.total++;
-    			if (total > 10) {
-    				sub.remove(value);
-    				sub.remove(value - 1);
-    				this.total = 0;
-    				iteration = 0;
-    				placeBasic(value - 1);
-    			}
-    		}
-    	}
-    	sub.setValue((k + (SIZE * i)), (l + (SIZE * j)), value);
-    	iteration++;
-    	if (iteration != 9) {	//need to fix iteration counter carrying over through recursive calls.
-    		placeBasic(value);
-    	} else if (value != 9 && iteration == 9); {
-    		iteration = 0;
-    		placeBasic(value + 1);
-    	}
-    	
-    } */
-    
-    /*
-     * Looks to see if the given spot is a zero
-     */
-    
-    public boolean isZero(int i, int j) {
-    	if (Grid[i][j] == 0) {
-    		return true;
-    	}
-    	return false;
-    }
-    
-    
-    
-   
-    
-   
-    
-    /************************************/
-    /*********INCOMPLETE METHODS*********/ 
-    /************************************/
-    
-    
-    
-    
-    
-   
-    	
-   
-    
-    public int optionsFill(int k, int l, int select) {			//l is only used if we are filling a box
-    	int count = 0;
-    	switch(select) {
-    	case 1: count = sub.countZerosInRow((k % SIZE), (k / SIZE));
-    			return (count * count);
-    	case 2: count = sub.countZerosInColumn((k % SIZE), (k / SIZE));
-    			return (count * count);
-    	case 3: count = sub.countZerosInBox(k, l);
-    			return (count * count);
-    	default: return 0;
-    	}
-    }
-
-    //Returns the number of options for placing numbers
-    
-    public int optionsNumber(int number) {
-    	int count = 0;
-    	return count;
-    }
-    
-    
-
+}
 
     /*****************************************************************************/
     /* NOTE: YOU SHOULD NOT HAVE TO MODIFY ANY OF THE FUNCTIONS BELOW THIS LINE. */
@@ -311,15 +195,12 @@ class Sudoku
      * outputs the completed puzzle to the standard output. */
     public static void main( String args[] ) throws Exception
     {
-    	System.out.println("Enter name of sudoku txt file: ");
         InputStream in;
         if( args.length > 0 ) {
-            in = new FileInputStream( args[0] );
-            System.out.println("I'm in here!");
+            in = new FileInputStream( args[0] );      
         }
         else {
         	in = System.in;
-        	System.out.println("or here...");
         }
             
 
